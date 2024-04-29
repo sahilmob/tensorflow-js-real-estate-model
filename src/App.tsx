@@ -4,6 +4,8 @@ import "./App.css";
 
 const INPUTS = [];
 const OUTPUTS = [];
+const LEARNING_RATE = 0.01;
+const OPTIMIZER = tf.train.sgd(LEARNING_RATE);
 
 for (let i = 0; i <= 20; i++) {
   INPUTS.push(i);
@@ -50,11 +52,19 @@ const model = tf.sequential();
 model.add(tf.layers.dense({ units: 1, inputShape: [1] }));
 model.summary();
 
-async function train() {
-  const LEARNING_RATE = 0.01;
+function logProgress(epoch: number, logs: tf.Logs | undefined) {
+  console.log(
+    "Epoch: " + epoch + " Loss: " + logs?.loss ? Math.sqrt(logs!.loss) : 0
+  );
 
+  if (epoch === 70) {
+    OPTIMIZER.setLearningRate(LEARNING_RATE / 2);
+  }
+}
+
+async function train() {
   model.compile({
-    optimizer: tf.train.sgd(LEARNING_RATE),
+    optimizer: OPTIMIZER,
     loss: tf.losses.meanSquaredError,
   });
 
@@ -62,6 +72,7 @@ async function train() {
     FEATURE_RESULT.NORMALIZED_VALUES,
     OUTPUT_TENSOR,
     {
+      callbacks: { onEpochEnd: logProgress },
       shuffle: true,
       batchSize: 2,
       epochs: 200,
