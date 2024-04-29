@@ -62,10 +62,9 @@ async function train() {
     FEATURE_RESULT.NORMALIZED_VALUES,
     OUTPUT_TENSOR,
     {
-      validationSplit: 0.15,
       shuffle: true,
-      batchSize: 64,
-      epochs: 10,
+      batchSize: 2,
+      epochs: 200,
     }
   );
 
@@ -75,12 +74,6 @@ async function train() {
   console.log(
     "Average error loss:" +
       Math.sqrt(result.history.loss[result.history.loss.length - 1] as number)
-  );
-  console.log(
-    "Average validation loss:" +
-      Math.sqrt(
-        result.history.val_loss[result.history.val_loss.length - 1] as number
-      )
   );
 
   evaluate();
