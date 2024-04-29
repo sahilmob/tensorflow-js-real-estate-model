@@ -1,17 +1,24 @@
 import * as tf from "@tensorflow/tfjs";
 
-import { TRAINING_DATA } from "./real-estate-data";
 import "./App.css";
 
-const INPUTS = TRAINING_DATA.inputs;
-const OUTPUTS = TRAINING_DATA.outputs;
+const INPUTS = [];
+const OUTPUTS = [];
+
+for (let i = 0; i <= 20; i++) {
+  INPUTS.push(i);
+}
+
+for (let i = 0; i <= 20; i++) {
+  OUTPUTS.push(INPUTS[i] * INPUTS[i]);
+}
 
 tf.util.shuffleCombo(INPUTS, OUTPUTS);
 
-const INPUT_TENSOR = tf.tensor2d(INPUTS);
+const INPUT_TENSOR = tf.tensor1d(INPUTS);
 const OUTPUT_TENSOR = tf.tensor1d(OUTPUTS);
 
-function normalize(tensor: tf.Tensor2D, min?: tf.Tensor, max?: tf.Tensor) {
+function normalize(tensor: tf.Tensor1D, min?: tf.Tensor, max?: tf.Tensor) {
   const result = tf.tidy(() => {
     const MIN_VALUES = min || tf.min(tensor, 0);
     const MAX_VALUES = max || tf.max(tensor, 0);
@@ -40,7 +47,7 @@ FEATURE_RESULT.MAX_VALUES.print();
 INPUT_TENSOR.dispose();
 
 const model = tf.sequential();
-model.add(tf.layers.dense({ units: 1, inputShape: [2] }));
+model.add(tf.layers.dense({ units: 1, inputShape: [1] }));
 model.summary();
 
 async function train() {
@@ -84,7 +91,7 @@ train();
 function evaluate() {
   tf.tidy(() => {
     const newInput = normalize(
-      tf.tensor2d([[750, 1]]),
+      tf.tensor1d([7]),
       FEATURE_RESULT.MIN_VALUES,
       FEATURE_RESULT.MAX_VALUES
     );
